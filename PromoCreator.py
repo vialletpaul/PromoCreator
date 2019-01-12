@@ -1,7 +1,6 @@
 # -*- coding: utf-8  -*-
 
 import discord
-import token
 import json
 from discord.ext import commands
 
@@ -20,7 +19,7 @@ def get_role(server_roles, name):
     for e in server_roles:
         print(e.name + "   " + name)
         if e.name == name:
-            return i
+            return e
         i += 1
 
 
@@ -55,7 +54,6 @@ async def create_roles(ctx: commands.context.Context):
 
         await guild.create_role(name=role["name"], colour=color, permissions=permissions, hoist=hoist,
                                 mentionable=mentionable)
-    await guild.send("Operation successful!")
 
 
 @bot.command(pass_context=True)
@@ -65,14 +63,16 @@ async def create_channels(ctx: commands.context.Context):
     for category in categories:
         permissions = {}
 
-        for permission in category["permission"]:
+        for permission in category["permissions"]:
             role = get_role(guild.roles, permission["role"])
             permissions[role] = {}
-            for perm, value in permission["permissions"].keys(), permission["permissions"].values():
-                permission[role][perm] = bool(value)
+
+            for perm, value in permission["permissions"].items():
+                permissions[role][perm] = bool(value)
+
             permissions[role] = discord.PermissionOverwrite(**permissions[role])
 
         name = category["name"]
-        await guild.create_category(category["name"], overwrites=permissions)
 
+        await guild.create_category(name, overwrites=permissions)
 bot.run(token)
