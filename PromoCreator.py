@@ -15,12 +15,15 @@ categories = []
 
 
 def get_role(server_roles, name):
-    i = 0
     for e in server_roles:
-        print(e.name + "   " + name)
         if e.name == name:
             return e
-        i += 1
+
+
+def get_category(server_channels, name):
+    for e in server_channels:
+        if e.name == name:
+            return e
 
 
 @bot.event
@@ -57,12 +60,16 @@ async def create_roles(ctx: commands.context.Context):
 
 
 @bot.command(pass_context=True)
-async def create_channels(ctx: commands.context.Context):
+async def create_channels(ctx: commands.context.Context, log=False):
+    if log:  # TODO: logging using logger
+        await ctx.send("Log is enable will narrate my process")
     guild = ctx.message.guild
     print("Channel Creation")
     for category in categories:
         permissions = {}
-
+        if log:
+            await ctx.send("Creating a new category: " + category["name"])
+        # TODO: get_permissions function
         for permission in category["permissions"]:
             role = get_role(guild.roles, permission["role"])
             permissions[role] = {}
@@ -75,4 +82,26 @@ async def create_channels(ctx: commands.context.Context):
         name = category["name"]
 
         await guild.create_category(name, overwrites=permissions)
+
+        if log:
+            await ctx.send("Creation success, I will now create sub-channels !")
+        for chan in category["channels"]:
+            if log:
+                await ctx.send("Creating a new channel: " + chan["name"])
+            # TODO: get_permissions function
+            permissions = {}
+            for permission in chan["permissions"]:
+                role = get_role(guild.roles, permission["role"])
+                permissions[role] = {}
+
+                for perm, value in permission["permissions"].items():
+                    permissions[role][perm] = bool(value)
+
+                permissions[role] = discord.PermissionOverwrite(**permissions[role])
+            await guild.create_text_channel(chan["name"], overwrites=permissions,
+                                            category=get_category(guild.channels, name))
+        if log:
+            await ctx.send("Creation success, jumping to next one !")
+
+    await ctx.send("Operation success")
 bot.run(token)

@@ -15,23 +15,26 @@
       "channels" : [
         {
           "name" : "Mega ultra chicken",
-          "roles" : [
-
+          "permissions" : [
+            {
+              "role" : "Modo",
+              "permissions" :
+                {
+                  "read_messages" : 1,
+                  "send_messages" : 0
+                }
+            }
           ]
         },
         {
           "name" : "Slifer the executive producer",
-          "roles" : [
+          "permissions" : [
 
           ]
         },
         {
           "name" : "Obelisk the tormentor",
-          "roles" : [
-            {
-              "name" : "Modo",
-              "permissions" : 0
-            }
+          "permissions" : [
           ]
         }
       ]
