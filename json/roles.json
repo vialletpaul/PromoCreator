@@ -1,0 +1,22 @@
+{
+  "roles": [
+    {
+      "name": "Admin",
+      "color": "gold",
+      "mentionable" : "True",
+      "hoist" : "False",
+      "permissions" : 8
+    },
+    {
+      "name": "Modo",
+      "color": "",
+      "mentionable" : "True",
+      "hoist" : "False",
+      "permissions" : 2146958839
+    }
+  ],
+  "promo_roles": {
+    "mentionable" : "True",
+    "hoist" : "True"
+  }
+}

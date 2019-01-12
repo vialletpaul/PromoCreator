@@ -1,0 +1,40 @@
+{
+  "categories": [
+    {
+      "name" : "Egyptian Gods",
+      "permissions" : [
+        {
+          "role" : "Modo",
+          "permissions" :
+            {
+              "read_messages" : 1,
+              "send_messages" : 0
+            }
+        }
+      ],
+      "channels" : [
+        {
+          "name" : "Mega ultra chicken",
+          "roles" : [
+
+          ]
+        },
+        {
+          "name" : "Slifer the executive producer",
+          "roles" : [
+
+          ]
+        },
+        {
+          "name" : "Obelisk the tormentor",
+          "roles" : [
+            {
+              "name" : "Modo",
+              "permissions" : 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
