@@ -26,6 +26,19 @@ def get_category(server_channels, name):
             return e
 
 
+def get_permissions(category, guild):
+    permissions = {}
+    for permission in category["permissions"]:
+        role = get_role(guild.roles, permission["role"])
+        permissions[role] = {}
+
+        for perm, value in permission["permissions"].items():
+            permissions[role][perm] = bool(value)
+
+        permissions[role] = discord.PermissionOverwrite(**permissions[role])
+    return permissions
+
+
 @bot.event
 async def on_ready():
     global roles, categories
@@ -66,18 +79,10 @@ async def create_channels(ctx: commands.context.Context, log=False):
     guild = ctx.message.guild
     print("Channel Creation")
     for category in categories:
-        permissions = {}
+
         if log:
             await ctx.send("Creating a new category: " + category["name"])
-        # TODO: get_permissions function
-        for permission in category["permissions"]:
-            role = get_role(guild.roles, permission["role"])
-            permissions[role] = {}
-
-            for perm, value in permission["permissions"].items():
-                permissions[role][perm] = bool(value)
-
-            permissions[role] = discord.PermissionOverwrite(**permissions[role])
+        permissions = get_permissions(category, guild)
 
         name = category["name"]
 
@@ -88,16 +93,7 @@ async def create_channels(ctx: commands.context.Context, log=False):
         for chan in category["channels"]:
             if log:
                 await ctx.send("Creating a new channel: " + chan["name"])
-            # TODO: get_permissions function
-            permissions = {}
-            for permission in chan["permissions"]:
-                role = get_role(guild.roles, permission["role"])
-                permissions[role] = {}
-
-                for perm, value in permission["permissions"].items():
-                    permissions[role][perm] = bool(value)
-
-                permissions[role] = discord.PermissionOverwrite(**permissions[role])
+            permissions = get_permissions(chan, guild)
             await guild.create_text_channel(chan["name"], overwrites=permissions,
                                             category=get_category(guild.channels, name))
         if log:
