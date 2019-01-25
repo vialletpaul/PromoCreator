@@ -15,6 +15,7 @@
       "channels" : [
         {
           "name" : "Mega ultra chicken",
+          "type" : "Text Channel",
           "permissions" : [
             {
               "role" : "Modo",
@@ -23,17 +24,27 @@
                   "read_messages" : 1,
                   "send_messages" : 0
                 }
+            },
+            {
+              "role" : "@everyone",
+              "permissions" :
+                {
+                  "read_messages" : 0,
+                  "send_messages" : 0
+                }
             }
           ]
         },
         {
           "name" : "Slifer the executive producer",
+          "type" : "Text Channel",
           "permissions" : [
 
           ]
         },
         {
           "name" : "Obelisk the tormentor",
+          "type" : "Voice Channel",
           "permissions" : [
           ]
         }

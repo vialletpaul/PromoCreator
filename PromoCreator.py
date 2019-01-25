@@ -4,6 +4,8 @@ import discord
 import json
 from discord.ext import commands
 
+import export
+
 version = "0.1"
 
 description = "PromoCreator allow you to initialize a discord server for your school on the EPITA's 2023 template"
@@ -14,22 +16,24 @@ roles = []
 categories = []
 
 
-def get_role(server_roles, name):
+def __get_role(server_roles, name):
     for e in server_roles:
         if e.name == name:
             return e
 
 
-def get_category(server_channels, name):
+def __get_category(server_channels, name):
     for e in server_channels:
         if e.name == name:
             return e
 
 
-def get_permissions(category, guild):
+def __get_permissions(category, guild):
     permissions = {}
     for permission in category["permissions"]:
-        role = get_role(guild.roles, permission["role"])
+        role = __get_role(guild.roles, permission["role"])
+        if not role:
+            continue
         permissions[role] = {}
 
         for perm, value in permission["permissions"].items():
@@ -43,9 +47,9 @@ def get_permissions(category, guild):
 async def on_ready():
     global roles, categories
     print('Loading roles JSON...')
-    with open('json/roles.json') as j:
+    with open('json/roles2.json', encoding='utf-8') as j:
         roles = json.load(j)["roles"]
-    with open('json/channels.json') as j:
+    with open('json/output.json', encoding='utf-8') as j:
         categories = json.load(j)["categories"]
 
 
@@ -60,7 +64,10 @@ async def create_roles(ctx: commands.context.Context):
         mentionable = True
 
         if role["color"]:
-            color = eval("discord.Colour." + role["color"] + "()")
+            h = role["color"].lstrip("#")
+            r, g, b = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+            print(r)
+            color = discord.Colour.from_rgb(r, g, b)
         if role["mentionable"]:
             mentionable = eval(role["mentionable"])
         if role["hoist"]:
@@ -82,7 +89,7 @@ async def create_channels(ctx: commands.context.Context, log=False):
 
         if log:
             await ctx.send("Creating a new category: " + category["name"])
-        permissions = get_permissions(category, guild)
+        permissions = __get_permissions(category, guild)
 
         name = category["name"]
 
@@ -93,11 +100,36 @@ async def create_channels(ctx: commands.context.Context, log=False):
         for chan in category["channels"]:
             if log:
                 await ctx.send("Creating a new channel: " + chan["name"])
-            permissions = get_permissions(chan, guild)
-            await guild.create_text_channel(chan["name"], overwrites=permissions,
-                                            category=get_category(guild.channels, name))
+            permissions = __get_permissions(chan, guild)
+            if chan["type"] == "Text Channel":
+                await guild.create_text_channel(chan["name"], overwrites=permissions,
+                                                category=__get_category(guild.channels, name))
+            elif chan["type"] == "Voice Channel":
+                await guild.create_voice_channel(chan["name"], overwrites=permissions,
+                                                 category=__get_category(guild.channels, name))
         if log:
             await ctx.send("Creation success, jumping to next one !")
 
     await ctx.send("Operation success")
+
+
+@bot.command(pass_context=True)
+async def export_server(ctx: commands.context.Context, repo="EPITA2024"):
+    await ctx.send("This server will be exported as a json file")
+    export.export_chan(ctx)
+    export.export_roles(ctx)
+    await ctx.send("Done !")
+
+
+@bot.command(pass_context=True)
+async def debug(ctx: commands.context.Context):
+    print("Can only be used in debug mod")
+    await ctx.send("Done !")
+
+
+@bot.command(pass_context=True)
+async def export_to_json(ctx: commands.context.Context):
+    return
+
+
 bot.run(token)
